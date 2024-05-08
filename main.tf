@@ -41,3 +41,39 @@ resource "aws_subnet" "main" {
     creator = var.creator
   }
 }
+
+data "aws_ami" "this" {
+  most_recent = true
+  owners      = ["amazon"]
+  filter {
+    name   = "architecture"
+    values = ["arm64"]
+  }
+  filter {
+    name   = "name"
+    values = ["al2023-ami-2023*"]
+  }
+}
+
+resource "aws_instance" "test" {
+  ami = data.aws_ami.this.id
+  instance_market_options {
+    spot_options {
+      max_price = 0.0031
+    }
+  }
+  instance_type = "t4g.nano"
+  tags = {
+    Name = "test-spot"
+  }
+}
+
+resource "aws_network_interface" "test" {
+  subnet_id       = aws_subnet.main.id
+  private_ips     = ["10.0.0.50"]
+
+  attachment {
+    instance     = aws_instance.test.id
+    device_index = 1
+  }
+}
