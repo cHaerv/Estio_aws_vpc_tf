@@ -23,6 +23,21 @@ resource "aws_vpc" "main" {
   }
 }
 
+resource "aws_security_group" "vpc_security_group" {
+    name = "ConnorSecurityGroup080524"
+    egress {
+        from_port = 80
+        to_port = 0
+        protocol = "http"
+        cidr_blocks = ["0.0.0.0/0"]
+
+    }
+    ingress {
+        
+    }
+  
+}
+
 resource "aws_internet_gateway" "gw" {
   vpc_id = aws_vpc.main.id
 
@@ -77,3 +92,4 @@ resource "aws_network_interface" "test" {
     device_index = 1
   }
 }
+
